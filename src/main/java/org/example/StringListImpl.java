@@ -20,12 +20,8 @@ public class StringListImpl implements StringList{
 
     @Override
     public String add(String item) {
-        if (capacity >= data.length) {
-            throw new IllegalArgumentException("Список полон");
-        }
-        if (Objects.isNull(item)) {
-            throw new IllegalArgumentException("Добавлять null нельзя");
-        }
+        theListIsFull();
+        doNotAddNull(item);
         data[capacity] = item;
         capacity++;
         return item;
@@ -33,18 +29,9 @@ public class StringListImpl implements StringList{
 
     @Override
     public String add(int index, String item) {
-        if (capacity >= data.length) {
-            throw new IllegalArgumentException("Список полон");
-        }
-        if (Objects.isNull(item)) {
-            throw new IllegalArgumentException("Добавлять null нельзя");
-        }
-        if (index < 0) {
-            throw new IllegalArgumentException("Индекс не может быть отрицательным");
-        }
-        if (index > capacity) {
-            throw new IllegalArgumentException("Индекс должен имень значение " + capacity);
-        }
+        theListIsFull();
+        doNotAddNull(item);
+        indexError(index);
         // Копирует и сдвигает
         // Пример. а б в г д null null null ... null
         // а б в в г д null ... null
@@ -58,15 +45,8 @@ public class StringListImpl implements StringList{
 
     @Override
     public String set(int index, String item) {
-        if (Objects.isNull(item)) {
-            throw new IllegalArgumentException("Добавлять null нельзя");
-        }
-        if (index < 0) {
-            throw new IllegalArgumentException("Индекс не может быть отрицательным");
-        }
-        if (index > capacity) {
-            throw new IllegalArgumentException("Индекс не может быть больше значения " + capacity);
-        }
+        doNotAddNull(item);
+        indexError(index);
         // Пишем вместо старого значения новое на тоже место
         return data[index] = item;
     }
@@ -80,12 +60,7 @@ public class StringListImpl implements StringList{
 
     @Override
     public String remove(int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException("Индекс не может быть отрицательным");
-        }
-        if (index >= capacity) {
-            throw new IllegalArgumentException("Индекс не может быть больше значения " + (capacity - 1));
-        }
+        indexError(index);
         String removed = data[index];
         // Копирует и сдвигает
         // Пример. а б в г д null null ... null
@@ -100,9 +75,7 @@ public class StringListImpl implements StringList{
 
     @Override
     public boolean contains(String item) {
-        if (Objects.isNull(item)) {
-            throw new IllegalArgumentException("Наличие null не проверяем");
-        }
+        doNotAddNull(item);
         for (int i = 0; i < capacity; i++) {
             if (data[i].equals(item)) {
                 return true;
@@ -113,9 +86,7 @@ public class StringListImpl implements StringList{
 
     @Override
     public int indexOf(String item) {
-        if (Objects.isNull(item)) {
-            throw new IllegalArgumentException("Наличие null не проверяем");
-        }
+        doNotAddNull(item);
         int index = -1;
         for (int i = 0; i < capacity; i++) {
             if (data[i].equals(item)) {
@@ -128,9 +99,7 @@ public class StringListImpl implements StringList{
 
     @Override
     public int lastIndexOf(String item) {
-        if (Objects.isNull(item)) {
-            throw new IllegalArgumentException("Наличие null не проверяем");
-        }
+        doNotAddNull(item);
         int index = -1;
         for (int i = capacity - 1; i >= 0; i--) {
             if (data[i].equals(item)) {
@@ -143,12 +112,7 @@ public class StringListImpl implements StringList{
 
     @Override
     public String get(int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException("Индекс не может быть отрицательным");
-        }
-        if (index > capacity) {
-            throw new IllegalArgumentException("Индекс не может быть больше значения " + capacity);
-        }
+        indexError(index);
         return data[index];
     }
 
@@ -192,5 +156,23 @@ public class StringListImpl implements StringList{
         String[] result = new String[capacity];
         System.arraycopy(data, 0, result, 0, capacity);
         return result;
+    }
+
+    private void theListIsFull() {
+        if (capacity >= data.length) {
+            throw new IllegalArgumentException("Список полон");
+        }
+    }
+
+    private void doNotAddNull(String item) {
+        if (Objects.isNull(item)) {
+            throw new IllegalArgumentException("Добавлять null нельзя");
+        }
+    }
+
+    private void indexError(int index) {
+        if (index < 0 || index > capacity) {
+            throw new IllegalArgumentException("Неверный индекс");
+        }
     }
 }
